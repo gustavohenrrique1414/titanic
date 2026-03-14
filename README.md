@@ -1,7 +1,9 @@
 # Titanic Survival Prediction
 
-This project aims to predict passenger survival on the Titanic using machine learning models.  
-The workflow includes **exploratory data analysis (EDA)**, **data preprocessing**, **model training**, and **performance evaluation**.
+This project applies machine learning techniques to predict passenger survival on the Titanic.  
+The workflow includes **exploratory data analysis (EDA)**, **data preprocessing**, **feature engineering**, and **model comparison**.
+
+The objective is to identify the key factors that influenced survival and build predictive models capable of estimating survival probability.
 
 ---
 
@@ -9,12 +11,12 @@ The workflow includes **exploratory data analysis (EDA)**, **data preprocessing*
 
 The dataset contains demographic and travel information about Titanic passengers.
 
-Main features include:
+Main features:
 
 - `Pclass` – Passenger class (1st, 2nd, 3rd)
-- `Sex` – Gender
+- `Sex` – Passenger gender
 - `Age` – Passenger age
-- `Fare` – Ticket price
+- `Fare` – Ticket fare
 - `Embarked` – Port of embarkation
 - `SibSp` – Number of siblings/spouses aboard
 - `Parch` – Number of parents/children aboard
@@ -29,77 +31,144 @@ Target variable:
 
 # Exploratory Data Analysis (EDA)
 
-The exploratory analysis revealed several important patterns:
+The exploratory analysis provided important insights about the structure of the data and the factors influencing survival.
 
-### Class Distribution
-The dataset is **moderately imbalanced**, with more passengers who did not survive.
+## Dataset Balance
 
-### Survival by Gender
-Gender is one of the strongest predictors:
-- **Women had a much higher survival rate**
-- **Men had a significantly lower survival rate**
+The dataset shows a **moderate class imbalance**, with a larger proportion of passengers who did not survive.  
+This imbalance requires careful evaluation using metrics beyond simple accuracy.
 
-### Survival by Passenger Class
-Passengers in **1st class had the highest survival probability**, while **3rd class passengers had the lowest**.
+---
 
-### Age Distribution
-Most passengers were between **20 and 40 years old**. Younger passengers had slightly higher survival rates.
+## Gender Impact on Survival
 
-### Fare Distribution
-Higher fares generally corresponded to **higher survival probability**, likely reflecting passenger class.
+Gender is the **strongest predictor** of survival.
 
-### Missing Values
+Key observations:
+
+- Women had a **significantly higher survival rate**
+- Most male passengers did **not survive**
+- The survival policy during the disaster followed the well-known **"women and children first" principle**
+
+This makes `Sex` one of the most important features for classification.
+
+---
+
+## Passenger Class and Socioeconomic Status
+
+Passenger class (`Pclass`) shows a strong relationship with survival probability.
+
+Insights:
+
+- **1st class passengers had the highest survival rate**
+- **3rd class passengers had the lowest survival rate**
+- Higher class passengers likely had **better cabin locations and easier access to lifeboats**
+
+This suggests that **socioeconomic status played a major role** in survival outcomes.
+
+---
+
+## Age Distribution
+
+The age distribution reveals that:
+
+- Most passengers were between **20 and 40 years old**
+- Younger passengers had **slightly higher survival rates**
+- Children had relatively better survival chances compared to adults
+
+However, age alone is **not as strong a predictor** as gender or passenger class.
+
+---
+
+## Fare Distribution
+
+The `Fare` variable is highly skewed and reflects passenger class.
+
+Observations:
+
+- Higher fares correlate with **higher survival probability**
+- This variable indirectly captures **wealth and class hierarchy**
+- Extreme fare values suggest the presence of **outliers**
+
+Because of its skewness, transformations or scaling may improve model performance.
+
+---
+
+## Family Structure
+
+Family-related features (`SibSp` and `Parch`) provide additional insights:
+
+- Passengers traveling with **small families had higher survival rates**
+- Passengers traveling **alone often had lower survival probability**
+- Very large families tended to have **lower survival rates**
+
+This suggests that **family size influences evacuation dynamics**.
+
+---
+
+## Missing Data Analysis
+
 Missing values were primarily found in:
+
 - `Age`
 - `Embarked`
+- `Cabin` (very large amount of missing data)
 
-These were handled using **imputation strategies** during preprocessing.
+Handling strategy:
+
+- `Age` → median imputation
+- `Embarked` → most frequent category
+- `Cabin` → removed or transformed into derived features
+
+These preprocessing steps help maintain dataset consistency without introducing significant bias.
 
 ---
 
 # Data Preprocessing
 
-The preprocessing pipeline included:
+A preprocessing pipeline was created to ensure consistent transformations across models.
 
-- Missing value imputation (`SimpleImputer`)
-- Numerical feature scaling (`StandardScaler`)
-- Categorical encoding (`OneHotEncoder` / `OrdinalEncoder`)
-- Feature engineering (family size, categorical transformations)
+Steps included:
 
-A structured **pipeline approach** was used to ensure reproducibility.
+- Missing value imputation
+- Feature scaling for numerical variables
+- Categorical encoding using one-hot encoding
+- Feature engineering
+
+Pipeline components used:
+
+- `SimpleImputer`
+- `StandardScaler`
+- `OneHotEncoder`
+- `ColumnTransformer`
+
+This approach improves reproducibility and prevents data leakage.
 
 ---
 
 # Models Evaluated
 
-Several machine learning models were trained and compared:
+Multiple classification algorithms were tested and compared:
 
 - Logistic Regression
 - Random Forest
 - Gradient Boosting
 - Support Vector Machine (SVC)
 
-Models were evaluated using validation datasets and multiple performance metrics.
+Each model was trained and evaluated using validation datasets.
 
 ---
 
 # Model Performance
 
-The models were compared using:
+Models were evaluated using several metrics:
 
 - Accuracy
 - ROC-AUC
 - Confusion Matrix
 - ROC Curves
 
-### Key Observations
-
-- **SVC achieved the highest ROC-AUC score**
-- **Gradient Boosting performed consistently well**
-- **Random Forest showed signs of overfitting**, with very high training accuracy but lower validation performance
-- Logistic Regression provided a strong and interpretable baseline
-
-Approximate ROC-AUC scores:
+Approximate ROC-AUC results:
 
 | Model | ROC-AUC |
 |------|------|
@@ -110,41 +179,33 @@ Approximate ROC-AUC scores:
 
 ---
 
-# Evaluation Metrics
+# Key Modeling Insights
 
-Performance was assessed using:
+### Best Overall Model
+Support Vector Machine achieved the **highest ROC-AUC**, indicating strong classification capability.
 
-- **Accuracy**
-- **ROC-AUC**
-- **Precision**
-- **Recall**
-- **Confusion Matrix**
+### Overfitting Detection
+Random Forest achieved extremely high training accuracy but lower validation accuracy, indicating **overfitting**.
 
-These metrics allow a better understanding of classification performance beyond accuracy alone.
+### Gradient Boosting Stability
+Gradient Boosting showed **consistent performance across training and validation**, suggesting good generalization.
 
----
-
-# Key Insights
-
-The analysis suggests that the most important factors influencing survival include:
-
-- Passenger **gender**
-- Passenger **class**
-- **Fare paid**
-- **Age**
-
-Women and passengers in higher classes had a significantly greater probability of survival.
+### Logistic Regression Baseline
+Despite its simplicity, Logistic Regression performed competitively and provides **high interpretability**.
 
 ---
 
-# Future Improvements
+# Key Insights from the Analysis
 
-Potential improvements to the project include:
+The most influential factors affecting survival appear to be:
 
-- Hyperparameter optimization using **cross-validation**
-- Model calibration for better probability estimates
-- Advanced ensemble methods such as **stacking**
-- Feature importance analysis using **SHAP values**
+1. **Gender**
+2. **Passenger class**
+3. **Ticket fare**
+4. **Age**
+5. **Family size**
+
+These variables capture both **demographic characteristics and socioeconomic status**, which strongly influenced survival outcomes during the disaster.
 
 ---
 
