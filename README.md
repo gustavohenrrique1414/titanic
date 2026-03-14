@@ -1,232 +1,163 @@
-# 🚢 **TITANIC SURVIVAL PREDICTION**
+# Titanic Survival Prediction
 
-> *"Por trás de cada linha deste dataset há um nome, um rosto, uma história interrompida. Este projeto é uma homenagem às 1.500+ vidas perdidas e um estudo sobre como dados podem revelar padrões de desigualdade, privilégio e sobrevivência."*
-
----
-
-## 📋 **Índice**
-
-1. [📖 Introdução Histórica](#-introdução-histórica)
-2. [🔍 Exploração de Dados (EDA)](#-exploração-de-dados-eda)
-3. [🔧 Pré-Processamento](#-pré-processamento)
-4. [🤖 Modelagem & Resultados](#-modelagem--resultados)
-5. [ Conclusões & Lições](#-conclusões--lições)
+This project aims to predict passenger survival on the Titanic using machine learning models.  
+The workflow includes **exploratory data analysis (EDA)**, **data preprocessing**, **model training**, and **performance evaluation**.
 
 ---
 
-## 📖 **Introdução Histórica**
+# Dataset
 
-### **Uma Noite que Mudou a História**
+The dataset contains demographic and travel information about Titanic passengers.
 
-> *"15 de abril de 1912, 2h20 da manhã. O navio considerado 'inafundável' encontra seu destino nas águas geladas do Atlântico Norte."*
+Main features include:
 
-| Estatística | Valor |
-|-------------|-------|
-| **Passageiros a bordo** | ~2.224 |
-| **Sobreviventes** | 705 |
-| **Vítimas** | ~1.519 |
-| **Taxa de sobrevivência** | 31.7% |
+- `Pclass` – Passenger class (1st, 2nd, 3rd)
+- `Sex` – Gender
+- `Age` – Passenger age
+- `Fare` – Ticket price
+- `Embarked` – Port of embarkation
+- `SibSp` – Number of siblings/spouses aboard
+- `Parch` – Number of parents/children aboard
 
-**Objetivo do Projeto:**
-- ✅ Analisar padrões de sobrevivência usando Exploratory Data Analysis (EDA)
-- ✅ Pré-processar dados evitando data leakage
-- ✅ Comparar múltiplos algoritmos de Machine Learning
-- ✅ Entender quais fatores determinaram quem viveu e quem morreu
+Target variable:
 
----
-
-## 🔍 **Exploração de Dados (EDA)**
-
-### **📊 Visão Geral do Dataset**
-
-```python
-data.shape  # (891, 12)
-data.columns  # PassengerId, Survived, Pclass, Name, Sex, Age, SibSp, 
-              # Parch, Ticket, Fare, Cabin, Embarked
-```
-
-### **⚠️ Dados Missing**
-
-| Variável | Missing | % | Impacto |
-|----------|---------|---|---------|
-| **Cabin** | 687 | 77% | ❌ Excluída |
-| **Age** | 177 | 20% | ⚠️ Imputação necessária |
-| **Embarked** | 2 | <1% | ✅ Quase completo |
-
-> *"77% dos registros de cabine se perderam. Não nos dados — na realidade. Quando o navio afundou, as listas de passageiros foram destruídas. O que temos são fragmentos de uma tragédia."*
-
-### **📈 Estatísticas Descritivas**
-
-| Feature | Mean | Std | Min | 50% | Max |
-|---------|------|-----|-----|-----|-----|
-| **Age** | 29.7 | 14.5 | 0.42 | 28 | 80 |
-| **Fare** | 32.20 | 49.69 | 0 | 14.45 | 512.33 |
-| **Pclass** | 2.31 | 0.84 | 1 | 3 | 3 |
-| **Survived** | 0.38 | 0.49 | 0 | 0 | 1 |
-
-### **🎯 Principais Insights da EDA**
-
-| Insight | Evidência | Impacto |
-|---------|-----------|---------|
-| **Mulheres sobreviveram mais** | 74% vs 19% (homens) | ⭐⭐⭐ |
-| **1ª classe teve prioridade** | 63% vs 24% (3ª classe) | ⭐⭐⭐ |
-| **Tarifa mais alta = mais vida** | Mediana £30 vs £13 | ⭐⭐ |
-| **Crianças foram priorizadas** | Mediana idade menor | ⭐⭐ |
-| **Cherbourg = mais sobreviventes** | 55% vs 34% (Southampton) | ⭐ |
-
-### **🔗 Correlações com Sobrevivência**
-
-```
-Feature      | Correlação | Interpretação
--------------|------------|----------------
-Pclass       | -0.34      | Classe menor = mais sobrevivência
-Fare         | +0.26      | Mais dinheiro = mais chances
-Age          | -0.08      | Idade maior = menos chances
-SibSp        | -0.04      | Pouco impacto
-Parch        | +0.08      | Pouco impacto
-```
-
-> *"Pclass e Fare são duas faces da mesma moeda: classe social. Juntas, elas explicam grande parte da variância na sobrevivência."*
+- `Survived`
+  - `0` = Did not survive
+  - `1` = Survived
 
 ---
 
-## 🔧 **Pré-Processamento**
+# Exploratory Data Analysis (EDA)
 
-### **🛡️ Regra de Ouro: FIT no Treino, TRANSFORM na Validação**
+The exploratory analysis revealed several important patterns:
 
-```python
-# ✅ CORRETO
-age_imputer.fit_transform(X_train[['Age']])   # Aprende do TREINO
-age_imputer.transform(X_val[['Age']])         # Aplica na VALIDAÇÃO
+### Class Distribution
+The dataset is **moderately imbalanced**, with more passengers who did not survive.
 
-# ❌ ERRADO (Data Leakage!)
-age_imputer.fit_transform(X[['Age']])         # Vaza informação do futuro!
-```
+### Survival by Gender
+Gender is one of the strongest predictors:
+- **Women had a much higher survival rate**
+- **Men had a significantly lower survival rate**
 
-> *"Nunca use informações do conjunto de validação no treino. Isso seria como estudar com a prova antes de fazer o exame."*
+### Survival by Passenger Class
+Passengers in **1st class had the highest survival probability**, while **3rd class passengers had the lowest**.
 
-### **📋 Estratégias de Imputação**
+### Age Distribution
+Most passengers were between **20 and 40 years old**. Younger passengers had slightly higher survival rates.
 
-| Feature | Estratégia | Justificativa |
-|---------|------------|---------------|
-| **Age** | Mediana | Distribuição com outliers |
-| **Fare** | Mediana | Altamente assimétrico |
-| **Sex** | Moda | Variável categórica binária |
-| **Embarked** | Moda | Apenas 2 missing |
+### Fare Distribution
+Higher fares generally corresponded to **higher survival probability**, likely reflecting passenger class.
 
-### **⚖️ Escalonamento**
+### Missing Values
+Missing values were primarily found in:
+- `Age`
+- `Embarked`
 
-| Feature | Scaler | Razão |
-|---------|--------|-------|
-| **Age** | StandardScaler | Distribuição ~normal |
-| **Fare** | MinMaxScaler | Outliers extremos (£0-£512) |
-
-### **🔢 Encoding**
-
-| Feature | Método | Categorias |
-|---------|--------|------------|
-| **Sex** | Ordinal | female=0, male=1 |
-| **Embarked** | OneHot | C, Q, S |
-| **Pclass** | OneHot | 1, 2, 3 |
-
-### **📊 Features Finais**
-
-```python
-['PassengerId', 'Survived', 'Sex', 'SibSp', 'Parch', 'Fare', 
- 'Embarked_C', 'Embarked_Q', 'Embarked_S', 
- 'Pclass_1', 'Pclass_2', 'Pclass_3']
-```
+These were handled using **imputation strategies** during preprocessing.
 
 ---
 
-## 🤖 **Modelagem & Resultados**
+# Data Preprocessing
 
-### **🥊 Os Contendores**
+The preprocessing pipeline included:
 
-| Modelo | Tipo | Característica |
-|--------|------|----------------|
-| **Logistic Regression** | Linear | Interpretável, simples |
-| **Random Forest** | Ensemble | Poderoso, prone a overfitting |
-| **Gradient Boosting** | Ensemble | Otimizador sequencial |
-| **SVC** | Kernel-based | Mestre de fronteiras |
+- Missing value imputation (`SimpleImputer`)
+- Numerical feature scaling (`StandardScaler`)
+- Categorical encoding (`OneHotEncoder` / `OrdinalEncoder`)
+- Feature engineering (family size, categorical transformations)
 
-### **📈 Performance Comparison**
-
-| Modelo | Train Accuracy | Val Accuracy | Gap | AUC | Veredito |
-|--------|---------------|--------------|-----|-----|----------|
-| **Gradient Boosting** | 91% | 84% | +7% | 0.836 | ⭐ Equilibrado |
-| **Random Forest** | 98% | 81% | +17% | 0.801 | ⚠️ Overfitting |
-| **Logistic Regression** | 80% | 80% | 0% | 0.822 | ✅ Generalizou |
-| **SVC** | 84% | 80% | +4% | **0.846** | 🏆 Melhor AUC |
-
-### **🏆 Vencedores por Categoria**
-
-| Categoria | Modelo | Métrica |
-|-----------|--------|---------|
-| **Generalização** | Logistic Regression | Gap ~0% |
-| **Discriminação (AUC)** | **SVC** | **0.846** |
-| **Precisão em Mortes** | Gradient Boosting | 98 True Negatives |
-| **Interpretabilidade** | Logistic Regression | Coeficientes claros |
-
-### **⚠️ Lição Chave: Overfitting**
-
-> *"O Random Forest teve 98% de acurácia no treino, mas caiu para 81% na validação. Ele não aprendeu os padrões de sobrevivência; ele **decorou** os passageiros do treino. Isso é **Overfitting**: inteligência artificial que falha na vida real."*
-
-### **🎯 Matriz de Confusão (Melhor Modelo)**
-
-```
-                    Predicted
-                  ┌─────────┬─────────┐
-                  │  Não    │   Sim   │
-        ┌─────────┼─────────┼─────────┤
-Actual  │  Não    │   94    │    7    │
-        ├─────────┼─────────┼─────────┤
-        │  Sim    │   24    │   28    │
-        └─────────┴─────────┴─────────┘
-```
+A structured **pipeline approach** was used to ensure reproducibility.
 
 ---
 
-## 📊 **Conclusões & Lições**
+# Models Evaluated
 
-### **🔍 O Que os Dados Revelam**
+Several machine learning models were trained and compared:
 
-1. **✅ Classe Social > Tudo**
-   - Passageiros da 1ª classe tinham 3x mais chances de sobreviver
-   - Acesso privilegiado aos botes salva-vidas
+- Logistic Regression
+- Random Forest
+- Gradient Boosting
+- Support Vector Machine (SVC)
 
-2. **✅ Gênero Foi Crucial**
-   - 74% das mulheres sobreviveram vs 19% dos homens
-   - Política "mulheres e crianças primeiro" foi real
+Models were evaluated using validation datasets and multiple performance metrics.
 
-3. **✅ Dinheiro Importava**
-   - Fare correlacionado positivamente com sobrevivência
-   - Privilégio econômico salvou vidas
+---
 
-4. **✅ Crianças Foram Protegidas**
-   - Mediana de idade menor entre sobreviventes
+# Model Performance
 
-### **💡 Lições de Machine Learning**
+The models were compared using:
 
-| Lição | Explicação |
-|-------|------------|
-| **Valide Sempre** | Sem validação, escolheríamos o Random Forest (overfitting) |
-| **Simplicidade Vence** | Logistic Regression generalizou melhor que modelos complexos |
-| **AUC > Accuracy** | SVC venceu em discriminação, não em acurácia bruta |
-| **Entenda os Dados** | EDA revelou features importantes antes de modelar |
+- Accuracy
+- ROC-AUC
+- Confusion Matrix
+- ROC Curves
 
-### **🔮 Reflexão Final**
+### Key Observations
 
-> *"O Titanic não foi apenas um acidente naval. Foi um espelho da sociedade de 1912.*
+- **SVC achieved the highest ROC-AUC score**
+- **Gradient Boosting performed consistently well**
+- **Random Forest showed signs of overfitting**, with very high training accuracy but lower validation performance
+- Logistic Regression provided a strong and interpretable baseline
 
-*Os dados mostram claramente:*
-- *✅ Riqueza salvou vidas*
-- *✅ Gênero determinou destino*
-- *✅ Classe social foi sentença*
-- *✅ Crianças foram protegidas*
+Approximate ROC-AUC scores:
 
-*Quando treinamos modelos com esses dados, não estamos apenas prevendo 0 ou 1. Estamos capturando padrões de **desigualdade estrutural** que custaram mais de 1.500 vidas.*
+| Model | ROC-AUC |
+|------|------|
+| Logistic Regression | ~0.82 |
+| Random Forest | ~0.80 |
+| Gradient Boosting | ~0.83 |
+| SVC | ~0.85 |
 
-*O Titanic afundou há 114 anos. Mas as lições sobre privilégio, desigualdade e valor da vida humana continuam relevantes hoje.*
+---
 
-*Que este projeto seja mais que código. Seja memória."*
+# Evaluation Metrics
+
+Performance was assessed using:
+
+- **Accuracy**
+- **ROC-AUC**
+- **Precision**
+- **Recall**
+- **Confusion Matrix**
+
+These metrics allow a better understanding of classification performance beyond accuracy alone.
+
+---
+
+# Key Insights
+
+The analysis suggests that the most important factors influencing survival include:
+
+- Passenger **gender**
+- Passenger **class**
+- **Fare paid**
+- **Age**
+
+Women and passengers in higher classes had a significantly greater probability of survival.
+
+---
+
+# Future Improvements
+
+Potential improvements to the project include:
+
+- Hyperparameter optimization using **cross-validation**
+- Model calibration for better probability estimates
+- Advanced ensemble methods such as **stacking**
+- Feature importance analysis using **SHAP values**
+
+---
+
+# Technologies Used
+
+- Python
+- Pandas
+- NumPy
+- Scikit-learn
+- Matplotlib
+- Seaborn
+
+---
+
+# Project Structure
+
