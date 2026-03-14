@@ -4,7 +4,7 @@ Este projeto aplica técnicas de **Machine Learning** para prever a sobrevivênc
 
 O projeto segue um fluxo completo de ciência de dados:
 
-EDA → Pré-processamento → Treinamento de Modelos → Avaliação de Desempenho
+EDA → Pré-processamento → Treinamento de Modelos → Avaliação
 
 O objetivo é identificar **quais fatores influenciaram a sobrevivência** e construir modelos capazes de realizar previsões confiáveis.
 
@@ -42,8 +42,6 @@ O dataset apresenta um **leve desbalanceamento**, com maior número de passageir
 
 Por isso, a avaliação dos modelos considerou métricas além da acurácia.
 
----
-
 ### Impacto do sexo
 
 O **sexo do passageiro foi o fator mais determinante** para a sobrevivência.
@@ -55,8 +53,6 @@ Principais observações:
 
 Esse padrão reflete a política adotada durante o desastre conhecida como **"mulheres e crianças primeiro"**.
 
----
-
 ### Classe do passageiro
 
 A classe socioeconômica teve grande impacto na sobrevivência.
@@ -67,8 +63,6 @@ Observações importantes:
 - Passageiros da **3ª classe tiveram as menores taxas**
 - Isso sugere influência de fatores como **localização da cabine e acesso aos botes salva-vidas**
 
----
-
 ### Distribuição de idade
 
 A maior parte dos passageiros estava entre **20 e 40 anos**.
@@ -78,8 +72,6 @@ Observações:
 - Crianças tiveram **probabilidade ligeiramente maior de sobreviver**
 - Idade teve impacto menor que sexo e classe social
 
----
-
 ### Valor da passagem
 
 A variável **Fare** apresentou distribuição assimétrica com presença de outliers.
@@ -88,8 +80,6 @@ Observações:
 
 - Passagens mais caras estão associadas a **maiores taxas de sobrevivência**
 - Essa variável está fortemente relacionada à **classe do passageiro**
-
----
 
 ### Estrutura familiar
 
@@ -109,7 +99,7 @@ O pré-processamento foi implementado **manualmente utilizando estratégia Hold-
 
 Um princípio fundamental adotado foi:
 
-> Todos os transformadores são ajustados apenas nos dados de treino (fit) e aplicados no conjunto de validação (transform), evitando **data leakage**.
+Todos os transformadores são ajustados apenas nos dados de treino (`fit`) e aplicados no conjunto de validação (`transform`), evitando **data leakage**.
 
 Principais etapas:
 
@@ -125,3 +115,104 @@ Principais etapas:
 - Imputação com valor mais frequente
 - Codificação usando **OrdinalEncoder**
 
+```
+female → 0  
+male → 1
+```
+
+### Embarked
+- Imputação com valor mais frequente
+- Codificação usando **OneHotEncoder**
+
+Variáveis geradas:
+
+```
+Embarked_C
+Embarked_Q
+Embarked_S
+```
+
+### Pclass
+
+Codificação usando **OneHotEncoder**:
+
+```
+Pclass_1
+Pclass_2
+Pclass_3
+```
+
+Após o processamento:
+
+- Colunas categóricas originais foram removidas
+- Variáveis codificadas foram adicionadas ao dataset final
+
+---
+
+# Modelos avaliados
+
+Foram treinados diferentes algoritmos de classificação:
+
+- Logistic Regression
+- Random Forest
+- Gradient Boosting
+- Support Vector Machine (SVC)
+
+---
+
+# Resultados
+
+Os modelos foram avaliados utilizando:
+
+- Acurácia
+- Curva ROC
+- ROC-AUC
+- Matriz de confusão
+
+Resultados aproximados de ROC-AUC:
+
+| Modelo | ROC-AUC |
+|------|------|
+| Logistic Regression | ~0.82 |
+| Random Forest | ~0.80 |
+| Gradient Boosting | ~0.83 |
+| SVC | ~0.85 |
+
+---
+
+# Principais Insights
+
+As variáveis com maior impacto na sobrevivência foram:
+
+- **Sexo**
+- **Classe do passageiro**
+- **Valor da passagem**
+- **Idade**
+- **Estrutura familiar**
+
+Esses fatores refletem tanto características demográficas quanto **diferenças socioeconômicas entre os passageiros**.
+
+---
+
+# Tecnologias utilizadas
+
+- Python
+- Pandas
+- NumPy
+- Scikit-learn
+- Matplotlib
+- Seaborn
+
+---
+
+# Conclusão
+
+Este projeto demonstra como técnicas de **análise exploratória e aprendizado de máquina** podem ser utilizadas para identificar padrões relevantes em dados históricos.
+
+Os resultados mostram que fatores como **sexo, classe social e estrutura familiar** tiveram forte influência na sobrevivência dos passageiros do Titanic.
+
+Além disso, o projeto evidencia a importância de:
+
+- pré-processamento adequado
+- escolha correta de métricas
+- comparação entre diferentes modelos de classificação
