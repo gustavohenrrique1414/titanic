@@ -1,224 +1,127 @@
-# Titanic Survival Prediction
+# Previsão de Sobrevivência no Titanic
 
-This project applies machine learning techniques to predict passenger survival on the Titanic.  
-The workflow includes **exploratory data analysis (EDA)**, **data preprocessing**, **feature engineering**, and **model comparison**.
+Este projeto aplica técnicas de **Machine Learning** para prever a sobrevivência de passageiros no Titanic com base em características demográficas e socioeconômicas.
 
-The objective is to identify the key factors that influenced survival and build predictive models capable of estimating survival probability.
+O projeto segue um fluxo completo de ciência de dados:
+
+EDA → Pré-processamento → Treinamento de Modelos → Avaliação de Desempenho
+
+O objetivo é identificar **quais fatores influenciaram a sobrevivência** e construir modelos capazes de realizar previsões confiáveis.
 
 ---
 
 # Dataset
 
-The dataset contains demographic and travel information about Titanic passengers.
+O dataset contém informações sobre passageiros do Titanic, incluindo características pessoais e detalhes da viagem.
 
-Main features:
+Principais variáveis:
 
-- `Pclass` – Passenger class (1st, 2nd, 3rd)
-- `Sex` – Passenger gender
-- `Age` – Passenger age
-- `Fare` – Ticket fare
-- `Embarked` – Port of embarkation
-- `SibSp` – Number of siblings/spouses aboard
-- `Parch` – Number of parents/children aboard
+- **Pclass** — Classe do passageiro (1ª, 2ª ou 3ª)
+- **Sex** — Sexo do passageiro
+- **Age** — Idade
+- **Fare** — Valor da passagem
+- **Embarked** — Porto de embarque
+- **SibSp** — Número de irmãos/cônjuges a bordo
+- **Parch** — Número de pais/filhos a bordo
 
-Target variable:
+Variável alvo:
 
-- `Survived`
-  - `0` = Did not survive
-  - `1` = Survived
-
----
-
-# Exploratory Data Analysis (EDA)
-
-The exploratory analysis provided important insights about the structure of the data and the factors influencing survival.
-
-## Dataset Balance
-
-The dataset shows a **moderate class imbalance**, with a larger proportion of passengers who did not survive.  
-This imbalance requires careful evaluation using metrics beyond simple accuracy.
+- **Survived**
+  - `0` = Não sobreviveu
+  - `1` = Sobreviveu
 
 ---
 
-## Gender Impact on Survival
+# Análise Exploratória de Dados (EDA)
 
-Gender is the **strongest predictor** of survival.
+A análise exploratória revelou padrões importantes sobre os fatores associados à sobrevivência.
 
-Key observations:
+### Distribuição das classes
 
-- Women had a **significantly higher survival rate**
-- Most male passengers did **not survive**
-- The survival policy during the disaster followed the well-known **"women and children first" principle**
+O dataset apresenta um **leve desbalanceamento**, com maior número de passageiros que não sobreviveram.
 
-This makes `Sex` one of the most important features for classification.
+Por isso, a avaliação dos modelos considerou métricas além da acurácia.
 
 ---
 
-## Passenger Class and Socioeconomic Status
+### Impacto do sexo
 
-Passenger class (`Pclass`) shows a strong relationship with survival probability.
+O **sexo do passageiro foi o fator mais determinante** para a sobrevivência.
 
-Insights:
+Principais observações:
 
-- **1st class passengers had the highest survival rate**
-- **3rd class passengers had the lowest survival rate**
-- Higher class passengers likely had **better cabin locations and easier access to lifeboats**
+- Mulheres tiveram **taxa de sobrevivência muito maior**
+- Homens tiveram **maior probabilidade de não sobreviver**
 
-This suggests that **socioeconomic status played a major role** in survival outcomes.
-
----
-
-## Age Distribution
-
-The age distribution reveals that:
-
-- Most passengers were between **20 and 40 years old**
-- Younger passengers had **slightly higher survival rates**
-- Children had relatively better survival chances compared to adults
-
-However, age alone is **not as strong a predictor** as gender or passenger class.
+Esse padrão reflete a política adotada durante o desastre conhecida como **"mulheres e crianças primeiro"**.
 
 ---
 
-## Fare Distribution
+### Classe do passageiro
 
-The `Fare` variable is highly skewed and reflects passenger class.
+A classe socioeconômica teve grande impacto na sobrevivência.
 
-Observations:
+Observações importantes:
 
-- Higher fares correlate with **higher survival probability**
-- This variable indirectly captures **wealth and class hierarchy**
-- Extreme fare values suggest the presence of **outliers**
-
-Because of its skewness, transformations or scaling may improve model performance.
+- Passageiros da **1ª classe tiveram maior taxa de sobrevivência**
+- Passageiros da **3ª classe tiveram as menores taxas**
+- Isso sugere influência de fatores como **localização da cabine e acesso aos botes salva-vidas**
 
 ---
 
-## Family Structure
+### Distribuição de idade
 
-Family-related features (`SibSp` and `Parch`) provide additional insights:
+A maior parte dos passageiros estava entre **20 e 40 anos**.
 
-- Passengers traveling with **small families had higher survival rates**
-- Passengers traveling **alone often had lower survival probability**
-- Very large families tended to have **lower survival rates**
+Observações:
 
-This suggests that **family size influences evacuation dynamics**.
-
----
-
-## Missing Data Analysis
-
-Missing values were primarily found in:
-
-- `Age`
-- `Embarked`
-- `Cabin` (very large amount of missing data)
-
-Handling strategy:
-
-- `Age` → median imputation
-- `Embarked` → most frequent category
-- `Cabin` → removed or transformed into derived features
-
-These preprocessing steps help maintain dataset consistency without introducing significant bias.
+- Crianças tiveram **probabilidade ligeiramente maior de sobreviver**
+- Idade teve impacto menor que sexo e classe social
 
 ---
 
-# Data Preprocessing
+### Valor da passagem
 
-A preprocessing pipeline was created to ensure consistent transformations across models.
+A variável **Fare** apresentou distribuição assimétrica com presença de outliers.
 
-Steps included:
+Observações:
 
-- Missing value imputation
-- Feature scaling for numerical variables
-- Categorical encoding using one-hot encoding
-- Feature engineering
-
-Pipeline components used:
-
-- `SimpleImputer`
-- `StandardScaler`
-- `OneHotEncoder`
-- `ColumnTransformer`
-
-This approach improves reproducibility and prevents data leakage.
+- Passagens mais caras estão associadas a **maiores taxas de sobrevivência**
+- Essa variável está fortemente relacionada à **classe do passageiro**
 
 ---
 
-# Models Evaluated
+### Estrutura familiar
 
-Multiple classification algorithms were tested and compared:
+As variáveis **SibSp** e **Parch** indicam tamanho da família a bordo.
 
-- Logistic Regression
-- Random Forest
-- Gradient Boosting
-- Support Vector Machine (SVC)
+Padrões identificados:
 
-Each model was trained and evaluated using validation datasets.
-
----
-
-# Model Performance
-
-Models were evaluated using several metrics:
-
-- Accuracy
-- ROC-AUC
-- Confusion Matrix
-- ROC Curves
-
-Approximate ROC-AUC results:
-
-| Model | ROC-AUC |
-|------|------|
-| Logistic Regression | ~0.82 |
-| Random Forest | ~0.80 |
-| Gradient Boosting | ~0.83 |
-| SVC | ~0.85 |
+- Passageiros com **famílias pequenas tiveram maiores taxas de sobrevivência**
+- Passageiros viajando sozinhos tiveram **menor probabilidade de sobreviver**
+- Famílias muito grandes também tiveram menor sobrevivência
 
 ---
 
-# Key Modeling Insights
+# Pré-processamento dos dados
 
-### Best Overall Model
-Support Vector Machine achieved the **highest ROC-AUC**, indicating strong classification capability.
+O pré-processamento foi implementado **manualmente utilizando estratégia Hold-Out**, evitando o uso de pipelines automáticos.
 
-### Overfitting Detection
-Random Forest achieved extremely high training accuracy but lower validation accuracy, indicating **overfitting**.
+Um princípio fundamental adotado foi:
 
-### Gradient Boosting Stability
-Gradient Boosting showed **consistent performance across training and validation**, suggesting good generalization.
+> Todos os transformadores são ajustados apenas nos dados de treino (fit) e aplicados no conjunto de validação (transform), evitando **data leakage**.
 
-### Logistic Regression Baseline
-Despite its simplicity, Logistic Regression performed competitively and provides **high interpretability**.
+Principais etapas:
 
----
+### Age
+- Imputação de valores faltantes com **mediana**
+- Padronização usando **StandardScaler**
 
-# Key Insights from the Analysis
+### Fare
+- Imputação com **mediana**
+- Escalonamento usando **MinMaxScaler**
 
-The most influential factors affecting survival appear to be:
-
-1. **Gender**
-2. **Passenger class**
-3. **Ticket fare**
-4. **Age**
-5. **Family size**
-
-These variables capture both **demographic characteristics and socioeconomic status**, which strongly influenced survival outcomes during the disaster.
-
----
-
-# Technologies Used
-
-- Python
-- Pandas
-- NumPy
-- Scikit-learn
-- Matplotlib
-- Seaborn
-
----
-
-# Project Structure
+### Sex
+- Imputação com valor mais frequente
+- Codificação usando **OrdinalEncoder**
 
