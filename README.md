@@ -11,7 +11,6 @@
 3. [🔧 Pré-Processamento](#-pré-processamento)
 4. [🤖 Modelagem & Resultados](#-modelagem--resultados)
 5. [ Conclusões & Lições](#-conclusões--lições)
-6. [💻 Como Usar](#-como-usar)
 
 ---
 
